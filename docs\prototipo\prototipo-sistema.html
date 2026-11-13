@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sistema de bitácora del Área de Sistemas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#1E6B3C;--lima:#8CC63F;--tinta:#1D2B24;--papel:#F2F5F1;--hoja:#fff;--linea:#D3DCD1;--suave:#56675C;--oro:#9A6F12;--granate:#8A1F3D;--azul:#1F5A8A;--ok:#E3F1DF;--aviso:#F6EBCB;--mal:#F4DCE3;--info:#DCE9F4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--verde:#43A86B;--tinta:#E6EEE8;--papel:#121C17;--hoja:#1A2821;--linea:#2D3F35;--suave:#9CB0A3;--oro:#E0B450;--granate:#E88BA3;--azul:#8DBDE8;--ok:#21392A;--aviso:#3B3318;--mal:#3F222B;--info:#1E3347;color-scheme:dark}}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{font:15px/1.5 "Public Sans",system-ui,sans-serif;background:var(--papel);color:var(--tinta)}
+h1,h2,.num{font-family:Bitter,Georgia,serif;font-weight:700;letter-spacing:0}
+h1{font-size:26px;margin:0}h2{font-size:18px;margin:0 0 12px}
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100%}
+.side{background:var(--verde);color:#fff;padding:22px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.brand{display:flex;gap:10px;align-items:center;padding:0 10px 18px;font-family:Bitter,serif;font-weight:700;font-size:17px;line-height:1.15}
+.brand i{width:12px;height:34px;background:var(--lima);display:block}
+.side button.nav{all:unset;box-sizing:border-box;cursor:pointer;padding:10px 12px;border-radius:6px;color:#E3F0E6;font-weight:500;display:block}
+.side button.nav:hover{background:rgba(255,255,255,.1)}
+.side button.nav[aria-current="page"]{background:#fff;color:var(--verde);font-weight:600}
+.side .rol{margin-top:auto;font-size:13px;color:#CFE5D4}
+.side select{width:100%;margin-top:6px}
+main{padding:28px 34px 60px;max-width:1180px;width:100%}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.top p{margin:2px 0 0;color:var(--suave)}
+.nota{font-size:13px;color:var(--suave)}
+.tira{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--linea);background:var(--hoja);border-radius:8px;margin-bottom:22px}
+.tira div{padding:14px 18px;border-right:1px solid var(--linea)}.tira div:last-child{border:0}
+.num{font-size:30px;line-height:1.1;display:block}.tira span:not(.num){color:var(--suave);font-size:13px}
+.cols{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:22px;align-items:start}
+.card{background:var(--hoja);border:1px solid var(--linea);border-radius:8px;padding:20px}
+label{display:block;font-weight:500;font-size:13.5px;margin:12px 0 4px}
+input,select,textarea{font:inherit;color:inherit;background:var(--hoja);border:1px solid var(--linea);border-radius:6px;padding:8px 10px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible,tr[tabindex]:focus-visible{outline:2px solid var(--azul);outline-offset:1px}
+.seg{display:flex;border:1px solid var(--linea);border-radius:6px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--hoja);color:inherit;padding:8px 4px;font:inherit;cursor:pointer;border-right:1px solid var(--linea)}
+.seg button:last-child{border:0}.seg button[aria-pressed="true"]{background:var(--verde);color:#fff;font-weight:600}
+.btn{font:inherit;font-weight:600;border:0;border-radius:6px;padding:10px 16px;background:var(--verde);color:#fff;cursor:pointer}
+.btn:hover{filter:brightness(1.1)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sec{background:transparent;color:var(--verde);border:1px solid var(--verde);padding:5px 10px;font-size:13px}
+.lista{list-style:none;margin:0;padding:0}
+.lista li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--linea)}
+.lista li:last-child{border:0}.lista small{color:var(--suave);display:block}
+.pill{display:inline-block;border-radius:99px;padding:1px 10px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.ok{background:var(--ok);color:var(--verde)}.av{background:var(--aviso);color:var(--oro)}.mal{background:var(--mal);color:var(--granate)}.inf{background:var(--info);color:var(--azul)}
+.barras{display:flex;gap:14px;align-items:flex-end;height:120px;margin-top:6px}
+.barras div{flex:1;text-align:center;font-size:12.5px;color:var(--suave)}
+.barras b{display:block;background:var(--verde);border-radius:4px 4px 0 0;margin-bottom:4px;min-height:3px}
+.barras b.hoy{background:var(--lima)}
+.tabla{width:100%;border-collapse:collapse;background:var(--hoja);border:1px solid var(--linea);border-radius:8px;overflow:hidden;font-size:14px}
+.tabla th{text-align:left;font-weight:600;color:var(--suave);padding:10px 12px;border-bottom:1px solid var(--linea);font-size:13px}
+.tabla td{padding:10px 12px;border-bottom:1px solid var(--linea);vertical-align:top}
+.tabla tr:last-child td{border:0}.tabla tbody tr[tabindex]{cursor:pointer}.tabla tbody tr[tabindex]:hover{background:var(--papel)}
+.scroll{overflow-x:auto}
+.filtros{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}.filtros>*{width:auto;min-width:170px}
+.ficha{margin-top:18px}.ficha dl{display:grid;grid-template-columns:130px 1fr;gap:6px 14px;margin:0}.ficha dt{color:var(--suave)}.ficha dd{margin:0}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.folio{font-family:Bitter,serif;font-size:20px;color:var(--verde)}
+.toast{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--tinta);color:var(--papel);padding:12px 16px;border-radius:8px;max-width:360px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+[hidden]{display:none!important}
+@media(max-width:860px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center}.side .rol{margin:0;flex:1 1 100%}.brand{padding-bottom:6px;flex:1 1 100%}main{padding:20px 16px 50px}.cols{grid-template-columns:1fr}.tira{grid-template-columns:1fr 1fr}.tira div:nth-child(2){border-right:0}.tira div:nth-child(-n+2){border-bottom:1px solid var(--linea)}.dos{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:no-preference){.toast{animation:in .25s ease-out}@keyframes in{from{transform:translateY(10px);opacity:0}}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="side" aria-label="Principal">
+  <div class="brand"><i></i><span>Bitácora<br>Área de Sistemas</span></div>
+  <button class="nav" data-v="mostrador" aria-current="page">Mostrador</button>
+  <button class="nav" data-v="bitacora">Bitácora</button>
+  <button class="nav" data-v="estudiantes">Estudiantes</button>
+  <button class="nav" data-v="documentos">Documentos</button>
+  <div class="rol"><label for="rol" style="color:inherit;margin:0">Ver el sistema como</label>
+    <select id="rol"><option>Jefe de Área</option><option>Secretario</option><option>Usuario de Consulta</option></select></div>
+</nav>
+<main>
+<section id="mostrador">
+  <div class="top"><div><h1>Mostrador</h1><p id="fecha"></p></div><span class="nota">Datos de ejemplo</span></div>
+  <div class="tira" aria-live="polite">
+    <div><span class="num" id="cEnt">0</span><span>Entradas hoy</span></div>
+    <div><span class="num" id="cAlu">0</span><span>Alumnos</span></div>
+    <div><span class="num" id="cDoc">0</span><span>Docentes</span></div>
+    <div><span class="num" id="cAte">0</span><span>Atendidos</span></div>
+  </div>
+  <div class="cols">
+    <div class="card"><h2>Registrar entrada</h2>
+      <div class="seg" id="tipoSol" role="group" aria-label="Tipo de solicitante">
+        <button type="button" aria-pressed="true" data-t="alumno">Alumno</button><button type="button" aria-pressed="false" data-t="docente">Docente</button><button type="button" aria-pressed="false" data-t="otro">Otro</button></div>
+      <label for="mat" id="lMat">Matrícula</label><input id="mat" inputmode="numeric" autocomplete="off" placeholder="Ej. 000000000">
+      <label for="nom">Nombre</label><input id="nom" autocomplete="off">
+      <label for="asu">Asunto</label>
+      <select id="asu"><option>Soporte de equipo</option><option>Cuenta o acceso</option><option>Instalación de software</option><option>Red o internet</option><option>Trámite</option></select>
+      <p style="margin:16px 0 0"><button class="btn" id="reg">Registrar entrada</button></p></div>
+    <div><div class="card"><h2>Dentro ahora</h2><ul class="lista" id="dentro"></ul></div>
+      <div class="card" style="margin-top:22px"><h2>Entradas por día</h2><div class="barras" id="barras"></div></div></div>
+  </div>
+</section>
+
+<section id="bitacora" hidden>
+  <div class="top"><div><h1>Bitácora</h1><p>Historial de todas las atenciones</p></div></div>
+  <div class="filtros"><input id="q" placeholder="Buscar por folio o nombre" aria-label="Buscar"><select id="fT" aria-label="Tipo"><option value="">Todos los tipos</option><option value="alumno">Alumnos</option><option value="docente">Docentes</option><option value="otro">Otros</option></select><select id="fE" aria-label="Estado"><option value="">Todos los estados</option><option>Registrada</option><option>En proceso</option><option>Resuelta</option></select></div>
+  <div class="scroll"><table class="tabla"><thead><tr><th>Folio</th><th>Entrada</th><th>Salida</th><th>Solicitante</th><th>Asunto</th><th>Estado</th></tr></thead><tbody id="tb"></tbody></table></div>
+</section>
+
+<section id="estudiantes" hidden>
+  <div class="top"><div><h1>Estudiantes</h1><p>Dónde está cada alumno y cómo localizarlo</p></div></div>
+  <div class="scroll"><table class="tabla"><thead><tr><th>Estudiante</th><th>Situación</th><th>Lugar</th><th>Periodo</th></tr></thead><tbody id="te"></tbody></table></div>
+  <div class="card ficha" id="ficha" hidden></div>
+</section>
+
+<section id="documentos" hidden>
+  <div class="top"><div><h1>Documentos</h1><p>Genera el Word oficial con su folio</p></div></div>
+  <div class="cols">
+    <div class="card"><h2>Nuevo documento</h2>
+      <label for="dt">Tipo de documento</label><select id="dt"></select>
+      <label for="de">Estudiante</label><select id="de"></select>
+      <div class="dos"><div><label for="d1">Fecha de oficio</label><input id="d1" type="date"></div><div data-g="c"><label for="d2">Inicio</label><input id="d2" type="date"></div></div>
+      <div class="dos"><div data-g="c"><label for="d3">Término</label><input id="d3" type="date"></div><div data-g="c"><label for="d4">Horas</label><input id="d4" type="number" value="480"></div></div>
+      <div data-g="r"><label for="d5">Proyecto</label><input id="d5" placeholder="Nombre del proyecto"></div>
+      <div data-g="k"><label for="d6">Actividad y créditos</label><input id="d6" placeholder="Curso MOOC, 1 crédito"></div>
+      <div id="firm"></div>
+      <p style="margin:12px 0 0">Folio <span class="folio" id="fol"></span></p>
+      <p style="margin:12px 0 0"><button class="btn" id="gen">Generar documento</button></p></div>
+    <div class="card"><h2>Generados</h2><ul class="lista" id="hist"></ul></div>
+  </div>
+</section>
+</main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const hoy=new Date(),D=n=>new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()-n);
+const f2=d=>d.toISOString().slice(0,10),hm=d=>d.toTimeString().slice(0,5);
+$('#fecha').textContent=hoy.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const hh=(h,m)=>new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate(),h,m);
+let A=[ // atenciones de ejemplo
+ {f:'SIS-2026-000001',e:hh(9,5),s:hh(9,25),n:'Valeria Soto Mendoza',t:'alumno',a:'Cuenta o acceso',st:'Resuelta',at:1},
+ {f:'SIS-2026-000002',e:hh(9,40),s:hh(10,5),n:'Mtro. Raúl Camacho',t:'docente',a:'Soporte de equipo',st:'Resuelta',at:1},
+ {f:'SIS-2026-000003',e:hh(10,30),s:hh(10,42),n:'Diego Pineda Lara',t:'alumno',a:'Red o internet',st:'Resuelta',at:1},
+ {f:'SIS-2026-000004',e:hh(11,15),s:null,n:'Ana Lucía Ortega',t:'alumno',a:'Instalación de software',st:'En proceso',at:1}];
+let C=A.length;
+const rol=()=>$('#rol').value,consulta=()=>rol()==='Usuario de Consulta';
+const pill=s=>`<span class="pill ${s==='Resuelta'?'ok':s==='En proceso'?'av':'inf'}">${s}</span>`;
+const dia=[['lun',38],['mar',41],['mié',29],['jue',44],['vie',35]];
+function pintar(){
+ const ent=A.length,alu=A.filter(x=>x.t==='alumno').length,doc=A.filter(x=>x.t==='docente').length;
+ $('#cEnt').textContent=ent;$('#cAlu').textContent=alu;$('#cDoc').textContent=doc;$('#cAte').textContent=A.filter(x=>x.at).length;
+ const d=A.filter(x=>!x.s);
+ $('#dentro').innerHTML=d.length?d.map(x=>`<li><div><strong>${x.n}</strong><small>${x.a}, entró a las ${hm(x.e)}</small></div>${consulta()?'':`<button class="btn sec" data-s="${x.f}">Registrar salida</button>`}</li>`).join(''):'<li><span class="nota">Nadie en el área. Las nuevas entradas aparecen aquí.</span></li>';
+ const dd=[...dia,['hoy',ent]],mx=Math.max(...dd.map(x=>x[1]));
+ $('#barras').innerHTML=dd.map(x=>`<div><b class="${x[0]==='hoy'?'hoy':''}" style="height:${x[1]/mx*92}px"></b>${x[1]}<br>${x[0]}</div>`).join('');
+ const q=$('#q').value.toLowerCase(),t=$('#fT').value,e=$('#fE').value;
+ const r=A.filter(x=>(!t||x.t===t)&&(!e||x.st===e)&&(!q||(x.f+x.n).toLowerCase().includes(q))).slice().reverse();
+ $('#tb').innerHTML=r.length?r.map(x=>`<tr><td>${x.f}</td><td>${hm(x.e)}</td><td>${x.s?hm(x.s):'<span class="nota">En el área</span>'}</td><td>${x.n}<br><span class="nota">${x.t==='alumno'?'Alumno':x.t==='docente'?'Docente':'Otro'}</span></td><td>${x.a}</td><td>${pill(x.st)}</td></tr>`).join(''):'<tr><td colspan="6">No hay atenciones con esos filtros. Quita un filtro para ver más.</td></tr>';
+ $('#reg').disabled=consulta();$('#gen').disabled=consulta();
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b){const x=A.find(y=>y.f===b.dataset.s);x.s=new Date();pintar();aviso('Salida registrada a las '+hm(x.s)+'.')}});
+let tipo='alumno';
+$('#tipoSol').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;tipo=b.dataset.t;$$('#tipoSol button').forEach(x=>x.setAttribute('aria-pressed',x===b));$('#lMat').textContent=tipo==='alumno'?'Matrícula':'Matrícula (solo alumnos)';$('#mat').disabled=tipo!=='alumno'});
+$('#reg').addEventListener('click',()=>{const n=$('#nom').value.trim();if(!n||(tipo==='alumno'&&!$('#mat').value.trim())){aviso(tipo==='alumno'?'Escribe la matrícula y el nombre para registrar la entrada.':'Escribe el nombre para registrar la entrada.');return}
+ C++;A.push({f:'SIS-2026-'+String(C).padStart(6,'0'),e:new Date(),s:null,n,t:tipo,a:$('#asu').value,st:'Registrada',at:0});$('#nom').value='';$('#mat').value='';pintar();aviso('Entrada registrada con el folio SIS-2026-'+String(C).padStart(6,'0')+'.')});
+['q','fT','fE'].forEach(i=>$('#'+i).addEventListener('input',pintar));$('#rol').addEventListener('change',()=>{pintar();est();aviso('Ahora ves el sistema como '+rol()+'.')});
+function aviso(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(aviso.h);aviso.h=setTimeout(()=>t.hidden=true,3200)}
+$$('.nav').forEach(b=>b.addEventListener('click',()=>{$$('.nav').forEach(x=>x.removeAttribute('aria-current'));b.setAttribute('aria-current','page');['mostrador','bitacora','estudiantes','documentos'].forEach(v=>$('#'+v).hidden=v!==b.dataset.v)}));
+// estudiantes
+const E=[{n:'Valeria Soto Mendoza',m:'000000001',s:'Servicio Social',l:'Biblioteca municipal de ejemplo',p:'2026-1',tel:'55 1234 5601',c:'a000000001@tesi.edu.mx',h:'480 h, termina el 30 de noviembre'},
+ {n:'Diego Pineda Lara',m:'000000002',s:'Residencia',l:'Empresa de software de ejemplo',p:'2026-1',tel:'55 1234 5602',c:'a000000002@tesi.edu.mx',h:'Proyecto: tablero de ventas, 500 h'},
+ {n:'Ana Lucía Ortega',m:'000000003',s:'Servicio Social',l:'Centro de salud de ejemplo',p:'2026-1',tel:'55 1234 5603',c:'a000000003@tesi.edu.mx',h:'480 h, termina el 15 de diciembre'},
+ {n:'Iván Barrera Solís',m:'000000004',s:'Sin trámite en curso',l:'Sin lugar asignado',p:'2026-1',tel:'55 1234 5604',c:'a000000004@tesi.edu.mx',h:'Sin trámite abierto'}];
+function est(){$('#te').innerHTML=E.map((x,i)=>`<tr tabindex="0" data-i="${i}"><td><strong>${x.n}</strong><br><span class="nota">${x.m}</span></td><td><span class="pill ${x.s==='Servicio Social'?'inf':x.s==='Residencia'?'ok':'av'}">${x.s}</span></td><td>${x.l}</td><td>${x.p}</td></tr>`).join('');$('#ficha').hidden=true}
+function ficha(i){const x=E[i],c=!consulta();$('#ficha').hidden=false;$('#ficha').innerHTML=`<h2>${x.n}</h2><dl><dt>Matrícula</dt><dd>${x.m}</dd><dt>Situación</dt><dd>${x.s}, ${x.l}</dd><dt>Detalle</dt><dd>${x.h}</dd><dt>Teléfono</dt><dd>${c?x.tel:'<span class="nota">Tu rol no puede ver el contacto del estudiante.</span>'}</dd><dt>Correo</dt><dd>${c?x.c:'<span class="nota">Tu rol no puede ver el contacto del estudiante.</span>'}</dd></dl>`}
+$('#te').addEventListener('click',e=>{const r=e.target.closest('tr');if(r)ficha(r.dataset.i)});$('#te').addEventListener('keydown',e=>{if(e.key==='Enter'){const r=e.target.closest('tr');if(r)ficha(r.dataset.i)}});
+// documentos
+const TD={RES_ACEP:['Carta de aceptación de Residencia Profesional','ISC-RES-ACEP','cr'],RES_TERM:['Carta de término de Residencia Profesional','ISC-RES-TERM','cr'],SS_ACEP:['Carta de aceptación de Servicio Social','ISC-SS-ACEP','c'],SS_TERM:['Carta de término de Servicio Social','ISC-SS-TERM','c'],CTA:['Constancia de actividades complementarias','ISC-CTA','k']};
+const N={};let H=[];
+$('#dt').innerHTML=Object.entries(TD).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('');$('#de').innerHTML=E.map(x=>`<option>${x.n}</option>`).join('');$('#d1').value=f2(hoy);
+function doc(){const k=$('#dt').value,g=TD[k][2];$$('[data-g]').forEach(x=>x.hidden=!g.includes(x.dataset.g));
+ const b=k==='CTA'?['Destinatario','Jefe de División','Docente (Vo.Bo.)','Subdirección académica (Vo.Bo.)']:['Destinatario','Jefe de División'];
+ $('#firm').innerHTML=b.map((x,i)=>`<label for="fi${i}">${x}</label><select id="fi${i}"><option>Elegir del catálogo de personal</option><option>Mtro. Ebner Juárez Elías</option><option>Ing. Carolina Anabel Ayala Hernández</option></select>`).join('');
+ $('#fol').textContent=TD[k][1]+'-2026-'+String((N[k]||0)+1).padStart(5,'0')}
+$('#dt').addEventListener('change',doc);
+$('#gen').addEventListener('click',()=>{const k=$('#dt').value,fo=$('#fol').textContent;if($$('#firm select').some(s=>s.selectedIndex===0)){aviso('Elige quién firma cada bloque para generar el documento.');return}
+ N[k]=(N[k]||0)+1;H.unshift({fo,t:TD[k][0],e:$('#de').value});$('#hist').innerHTML=H.map(h=>`<li><div><strong>${h.fo}</strong><small>${h.t}, ${h.e}</small></div><span class="pill ok">Word listo</span></li>`).join('');doc();aviso('Documento '+fo+' generado.')});
+$('#hist').innerHTML='<li><span class="nota">Aquí aparecen los documentos que generes.</span></li>';
+pintar();est();doc();
+</script>
+</body>
+</html>
